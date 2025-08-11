@@ -8,7 +8,21 @@ FilePath     : /wynntilsresolver/resolver.py
 
 import inspect
 from collections import OrderedDict
-from typing import Any, Dict, List, Tuple, Type, TypeVar, Union, get_args, get_origin
+from dataclasses import field
+from typing import (
+    Any,
+    Dict,
+    List,
+    Optional,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+    dataclass_transform,
+    get_args,
+    get_origin,
+    overload,
+)
 
 from .blocks import Block, End, ItemType, Version
 from .exception import InvalidStartByte, ParseFailed, ResolverDefinitionError

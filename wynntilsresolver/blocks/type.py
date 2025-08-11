@@ -24,10 +24,6 @@ class ItemType(Block):
     _required_blocks: List[Type[Block]] = []
     _optional_blocks: List[Type[Block]] = []
 
-    def __init__(self, required_blocks: List[Type[Block]], optional_blocks: List[Type[Block]]) -> None:
-        self._required_blocks = required_blocks
-        self._optional_blocks = optional_blocks
-
     def to_bytes(self) -> List[int]:
         return self.encode_with_start([self._type_id])
 
@@ -49,4 +45,4 @@ class GearItem(ItemType):
         if data[0] != cls._type_id:
             raise InvalidItemType(f"Invalid item type {data[0]} for item {cls.__name__}")
         del data[0]
-        return cls(cls._required_blocks, cls._optional_blocks)
+        return cls()

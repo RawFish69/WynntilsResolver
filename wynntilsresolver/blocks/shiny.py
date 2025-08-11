@@ -27,22 +27,28 @@ class Shiny(Block):
     display_name: str
     """Display name of the shiny. From Artemis Data."""
     value: int
+    """Value of the shiny."""
+    reroll: int = 0
+    """Reroll count of the shiny."""
 
-    def __init__(self, name: str, internal_id: int, display_name: str, value: int) -> None:
+    def __init__(self, name: str, internal_id: int, display_name: str, value: int, reroll: int) -> None:
         self.name = name
         self.internal_id = internal_id
         self.display_name = display_name
         self.value = value
+        self.reroll = reroll
 
     @classmethod
     def from_bytes(cls, data, **kwargs) -> "Shiny":
         super().from_bytes(data)
         internal_id = data[0]
         del data[0]
+        reroll = data[0] if data else 0
+        del data[0]
         value = cls.decode_variable_sized_int(data)
         for shiny in shiny_table:
             if shiny["id"] == internal_id:
-                return cls(shiny["key"], internal_id, shiny["displayName"], value)
+                return cls(shiny["key"], internal_id, shiny["displayName"], value, reroll)
 
         raise ValueError(f"Shiny with internal ID {internal_id} not found in shiny table.")
 
@@ -50,7 +56,7 @@ class Shiny(Block):
         return self.encode_with_start([self.internal_id] + self.encode_variable_sized_int(self.value))
 
     def __str__(self) -> str:
-        return f"{self.display_name}: {self.value}"
+        return f"Shiny(name={self.name}, internal_id={self.internal_id}, display_name={self.display_name}, value={self.value}, reroll={self.reroll})"
 
     def __repr__(self) -> str:
-        return f"Shiny({self.display_name}, {self.value})"
+        return f"Shiny(name={self.name}, internal_id={self.internal_id}, display_name={self.display_name}, value={self.value}, reroll={self.reroll})"

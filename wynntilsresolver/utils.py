@@ -3,7 +3,7 @@ import functools
 import inspect
 import sys
 import types
-from typing import Any, Callable, Coroutine, Dict, List, TypeVar
+from typing import Any, Callable, Coroutine, Dict, List, ParamSpec, TypeVar
 
 
 def get_annotations_meta(annotation: Dict[str, Any], *, globals=None, locals=None, eval_str=False) -> Dict[str, Any]:
@@ -11,8 +11,8 @@ def get_annotations_meta(annotation: Dict[str, Any], *, globals=None, locals=Non
 
     Args:
         annotation (Dict[str, Any]): The __annotations__ dict.
-        globals (_type_, optional): globals for eval. Defaults to None.
-        locals (_type_, optional): locals for eval. Defaults to None.
+        globals (Dict[str, Any], optional): globals for eval. Defaults to None.
+        locals (Dict[str, Any], optional): locals for eval. Defaults to None.
         eval_str (bool, optional): Eval the stringlized type. Defaults to False.
 
     Returns:
@@ -156,14 +156,15 @@ def get_annotations(obj, *, globals=None, locals=None, eval_str=False):
     return return_value
 
 
+P = ParamSpec("P")
 R = TypeVar("R")
 
 
-def run_async(func: Callable[..., Coroutine[Any, Any, R]]) -> Callable[..., R]:
+def run_async(func: Callable[P, Coroutine[Any, Any, R]]) -> Callable[P, R]:
     """A decorator to run a async function synchronously."""
 
     @functools.wraps(func)
-    def wrapper(*args, **kwargs) -> R:
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
         loop = asyncio.get_event_loop()
         if loop.is_running():
             return loop.run_until_complete(func(*args, **kwargs))
