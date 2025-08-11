@@ -9,12 +9,20 @@ FilePath     : /src/wynntilsresolver/blocks/shiny.py
 import json
 from typing import Dict, List
 
+from wynntilsresolver.blocks.version import Version
 from wynntilsresolver.startup import SHINY_TABLE_PATH
 
 from .block import Block
 
 with open(SHINY_TABLE_PATH, encoding="utf-8") as f:
     shiny_table: List[Dict] = json.load(f)
+
+
+def extract_version(parsed_blocks: list["Block"]) -> int:
+    for block in parsed_blocks:
+        if isinstance(block, Version):
+            return block.version
+    return 0
 
 
 class Shiny(Block):
@@ -39,12 +47,13 @@ class Shiny(Block):
         self.reroll = reroll
 
     @classmethod
-    def from_bytes(cls, data, **kwargs) -> "Shiny":
+    def from_bytes(cls, data, parsed_blocks: list[Block], **kwargs) -> "Shiny":
         super().from_bytes(data)
         internal_id = data[0]
         del data[0]
-        reroll = data[0] if data else 0
-        del data[0]
+        if extract_version(parsed_blocks) >= 1:
+            reroll = data[0] if data else 0
+            del data[0]
         value = cls.decode_variable_sized_int(data)
         for shiny in shiny_table:
             if shiny["id"] == internal_id:

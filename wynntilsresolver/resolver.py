@@ -8,20 +8,16 @@ FilePath     : /wynntilsresolver/resolver.py
 
 import inspect
 from collections import OrderedDict
-from dataclasses import field
 from typing import (
     Any,
     Dict,
     List,
-    Optional,
     Tuple,
     Type,
     TypeVar,
     Union,
-    dataclass_transform,
     get_args,
     get_origin,
-    overload,
 )
 
 from .blocks import Block, End, ItemType, Version
@@ -103,7 +99,7 @@ class Resolver(metaclass=ResolverMeta):
         attrs = self._attrs.copy()
         required_blocks = {k: v for k, v in attrs.items() if v in self.item_type._required_blocks}
         optional_blocks = {k: v for k, v in attrs.items() if v in self.item_type._optional_blocks}
-        parsed_blocks = []
+        parsed_blocks: list[Block] = []
 
         while data:
             k = None
