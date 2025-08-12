@@ -51,8 +51,10 @@ class Shiny(Block):
         super().from_bytes(data)
         internal_id = data[0]
         del data[0]
+
+        reroll = 0
         if extract_version(parsed_blocks) >= 1:
-            reroll = data[0] if data else 0
+            reroll = data[0]
             del data[0]
         value = cls.decode_variable_sized_int(data)
         for shiny in shiny_table:
